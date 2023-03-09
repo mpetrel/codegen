@@ -17,8 +17,10 @@ type StructInfo struct {
 }
 
 type FieldsItem struct {
-	Name string
-	Type string
+	Name    string
+	Type    string
+	DBTag   string
+	JsonTag string
 }
 
 func ASTParse(filePath string) (*StructInfo, error) {

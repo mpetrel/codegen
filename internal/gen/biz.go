@@ -12,7 +12,7 @@ func Biz(stInfo *goparse.StructInfo) *jen.File {
 	// 生成结构体
 	var structFields []jen.Code
 	for _, field := range stInfo.Fields {
-		structFields = append(structFields, jen.Id(field.Name).Id(field.Type))
+		structFields = append(structFields, jen.Id(field.Name).Id(field.Type).Tag(map[string]string{"json": field.JsonTag}))
 	}
 	f.Type().Id(stInfo.Name).Struct(
 		structFields...,
