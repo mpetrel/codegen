@@ -144,8 +144,52 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 					}),
 				jen.Nil(),
 			),
-
 		)
+
+	// newRepo方法
+	f.Func().Id(fmt.Sprintf("New%sRepo", stInfo.Name)).Params(
+		jen.Id("data").Op("*").Id("Data"),
+		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Entry"),
+	).Qual(importBiz, fmt.Sprintf("%sRepo", stInfo.Name)).Block(jen.Return(
+		jen.Op("&").Id(repoName).Values(jen.Dict{
+			jen.Id("data"): jen.Id("data"),
+			jen.Id("log"): jen.Id("logger").
+				Dot("WithFields").
+				Call(jen.Id("logrus.Fields").Values(
+					jen.Dict{jen.Lit("module"): jen.Lit("data/" + str.LowerFirst(stInfo.Name))},
+				)),
+		}),
+	))
+
+	// 生成结构体赋值
+	bizList := make(jen.Dict)
+	dataList := make(jen.Dict)
+	firstLower := str.GetFirstLower(stInfo.Name)
+
+	for _, v := range stInfo.Fields {
+		bizList[jen.Id(v.Name)] = jen.Id(firstLower).Dot(v.Name)
+		dataList[jen.Id(v.Name)] = jen.Id(firstLower).Dot(v.Name)
+	}
+	// toBiz方法
+	f.Func().Id(toBizName).Params(jen.Id(firstLower).Op("*").Id(stInfo.Name)).Op("*").Qual(importBiz, stInfo.Name).
+		Block(
+			jen.Return(
+				jen.Op("&").Qual(importBiz, stInfo.Name).Values(bizList),
+			),
+		)
+
+	// toData方法
+	dataList[jen.Id("Model")] = jen.Qual(importOrm, "Model").Values(
+		jen.Dict{jen.Id("Id"): jen.Id(firstLower).Dot("Id")},
+	)
+	f.Func().Id(toDataName).Params(jen.Id(firstLower).Op("*").Qual(importBiz, stInfo.Name)).
+		Op("*").Id(stInfo.Name).Block(
+		jen.Return(
+			jen.Op("&").Id(stInfo.Name).Values(
+				dataList,
+			),
+		),
+	)
 
 	return f
 }

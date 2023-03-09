@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dave/jennifer/jen"
 	"github.com/mpetrel/codegen/internal/goparse"
+	"github.com/mpetrel/codegen/internal/pkg/str"
 )
 
 func Biz(stInfo *goparse.StructInfo) *jen.File {
@@ -68,7 +69,7 @@ func Biz(stInfo *goparse.StructInfo) *jen.File {
 				jen.Id("log"): jen.Id("logger").
 					Dot("WithFields").
 					Call(jen.Id("logrus.Fields").Values(
-						jen.Dict{jen.Lit("module"): jen.Lit("biz/" + stInfo.Name)},
+						jen.Dict{jen.Lit("module"): jen.Lit("biz/" + str.LowerFirst(stInfo.Name))},
 					)),
 			}),
 		),
