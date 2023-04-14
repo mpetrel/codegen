@@ -10,6 +10,10 @@ import (
 func Biz(stInfo *goparse.StructInfo) *jen.File {
 	f := jen.NewFile("biz")
 
+	// 指定导入包名
+	f.ImportNames(map[string]string{
+		"github.com/sirupsen/logrus": "logrus",
+	})
 	// 生成结构体
 	var structFields []jen.Code
 	for _, field := range stInfo.Fields {
@@ -23,7 +27,7 @@ func Biz(stInfo *goparse.StructInfo) *jen.File {
 	repoName := fmt.Sprintf("%sRepo", stInfo.Name)
 	useCaseName := fmt.Sprintf("%sUseCase", stInfo.Name)
 
-	ctx := jen.Id("ctx").Id("context.Context")
+	ctx := jen.Id("ctx").Qual("context", "Context")
 	// 生成data接口
 	f.Type().Id(repoName).Interface(
 		jen.Id("Create").Params(

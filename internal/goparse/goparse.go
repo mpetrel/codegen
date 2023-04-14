@@ -2,6 +2,7 @@ package goparse
 
 import (
 	"fmt"
+	"github.com/mpetrel/codegen/internal/pkg/str"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -69,12 +70,27 @@ func ASTParse(filePath string) (*StructInfo, error) {
 		for _, field := range s.Fields.List {
 			fmt.Printf("Field: %s, Type: %s\n", field.Names[0].Name, types.ExprString(field.Type))
 			fields = append(fields, FieldsItem{
-				Name: field.Names[0].Name,
-				Type: types.ExprString(field.Type),
+				Name:    field.Names[0].Name,
+				Type:    types.ExprString(field.Type),
+				JsonTag: str.LowerFirst(field.Names[0].Name),
+				DBTag:   getDBTag(types.ExprString(field.Type)),
 			})
 		}
 		structInfo.Fields = fields
 		return false
 	})
 	return structInfo, nil
+}
+
+func getDBTag(typeName string) string {
+	switch typeName {
+	case "uint64", "int", "int32", "int64":
+		return "type:int"
+	case "bool":
+		return "type:tinyint"
+	case "time.Time":
+		return "type:datetime"
+	default:
+		return "type:varchar(256)"
+	}
 }

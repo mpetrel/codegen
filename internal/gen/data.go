@@ -6,6 +6,7 @@ import (
 	"github.com/mpetrel/codegen/internal/goparse"
 	"github.com/mpetrel/codegen/internal/pkg/common"
 	"github.com/mpetrel/codegen/internal/pkg/str"
+	"golang.org/x/exp/slices"
 )
 
 func Data(stInfo *goparse.StructInfo) *jen.File {
@@ -22,12 +23,17 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 		importLogrus: "logrus",
 	})
 
-	ctx := jen.Id("ctx").Id("context.Context")
+	// ctx := jen.Id("ctx").Id("context.Context")
+	ctx := jen.Id("ctx").Qual("context", "Context")
 
+	excludeFields := []string{"createdAt", "updatedAt", "deletedAt"}
 	// 生成 data struct
 	var structFields []jen.Code
 	structFields = append(structFields, jen.Qual(importOrm, "Model"))
 	for _, field := range stInfo.Fields {
+		if slices.Contains(excludeFields, field.Name) {
+			continue
+		}
 		structFields = append(structFields, jen.Id(field.Name).Id(field.Type).Tag(map[string]string{"gorm": field.DBTag}))
 	}
 	f.Type().Id(stInfo.Name).Struct(
@@ -49,7 +55,7 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 	repoMV := str.GetFirstLower(stInfo.Name)
 	repoPtr := fmt.Sprintf("*%sRepo", str.LowerFirst(stInfo.Name))
 	// db 调用前缀
-	dbCallPrefix := jen.Id(repoMV).Dot("data").Dot("DB").Call(jen.Id("ctx"))
+	// dbCallPrefix := jen.Id(repoMV).Dot("data").Dot("DB").Call(jen.Id("ctx"))
 	f.Func().Params(jen.Id(repoMV).Id(repoPtr)).
 		Id("Create").
 		Params(
@@ -72,7 +78,7 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 		Id("Delete").
 		Params(ctx, jen.Id("id").Uint64()).Error().Block(
 		jen.Return(
-			dbCallPrefix.Dot("Delete").Call(
+			jen.Id(repoMV).Dot("data").Dot("DB").Call(jen.Id("ctx")).Dot("Delete").Call(
 				jen.Op("&").Id(stInfo.Name).Values(),
 				jen.Id("id"),
 			).Dot("Error"),
@@ -84,7 +90,7 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 		Params(ctx, jen.Id("item").Op("*").Qual(importBiz, stInfo.Name)).Error().Block(
 		jen.Id("dataItem").Op(":=").Id(toDataName).Call(jen.Id("item")),
 		jen.Return(
-			dbCallPrefix.Dot("Scopes").Call(jen.Id("CommonOmit").Call()).Dot("Updates").
+			jen.Id(repoMV).Dot("data").Dot("DB").Call(jen.Id("ctx")).Dot("Scopes").Call(jen.Id("CommonOmit").Call()).Dot("Updates").
 				Call(jen.Id("dataItem")).Dot("Error"),
 		),
 	)
@@ -101,7 +107,7 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 				jen.Err().Op(":=").Id(repoMV).Dot("data").Dot("DB").Call(jen.Id("ctx")).
 					Dot("First").Call(jen.Op("&").Id("item"), jen.Id("id")).Dot("Error"),
 				jen.Err().Op("!=").Nil(),
-			).Block(jen.Return(jen.Err())),
+			).Block(jen.Return(jen.Nil(), jen.Err())),
 			jen.Return(
 				jen.Id(toBizName).Call(jen.Op("&").Id("item")),
 				jen.Nil(),

@@ -3,22 +3,16 @@ package gen
 import (
 	"fmt"
 	"github.com/mpetrel/codegen/internal/goparse"
+	"github.com/mpetrel/codegen/internal/pkg/common"
 	"testing"
 )
 
-type User struct {
-	Id   uint64
-	Name string
-	Sex  int
-	Age  int
-	Role []uint64
-}
-
-func TestBiz(t *testing.T) {
+func TestService(t *testing.T) {
+	common.ProjectName = "codegen"
 	stInfo, err := goparse.ASTParse("./biz_test.go")
 	if err != nil {
 		t.Error(err)
 	}
-	f := Biz(stInfo)
+	f := Service(stInfo)
 	fmt.Printf("%#v", f)
 }
