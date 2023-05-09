@@ -25,7 +25,7 @@ func main() {
 	flag.Parse()
 	common.ProjectName = projectName
 
-	structFile = "C:\\Users\\Larry\\GolandProjects\\chatgpt-mp-workspace\\chatgpt-mp-service\\internal\\biz\\reguser.go"
+	structFile = "C:\\Users\\Larry\\GolandProjects\\chatgpt-mp-workspace\\chatgpt-mp-service\\internal\\biz\\render_task.go"
 	common.ProjectName = "chatgpt-mp-service"
 
 	stInfo, err := goparse.ASTParse(structFile)

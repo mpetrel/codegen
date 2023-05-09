@@ -183,7 +183,7 @@ func Service(stInfo *goparse.StructInfo) *jen.File {
 
 	// add route
 	f.Func().Params(jen.Id("s").Id("*"+serviceName)).
-		Id("AddRoute").Params(jen.Id("rg").Qual("github.com/gin-gonic/gin", "RouterGroup")).Block(
+		Id("AddRoute").Params(jen.Id("rg").Op("*").Qual("github.com/gin-gonic/gin", "RouterGroup")).Block(
 		jen.Id(createVarName).Op(":=").Id("rg").Dot("Group").Call(
 			jen.Lit("/"+createVarName),
 		),
