@@ -155,7 +155,7 @@ func Data(stInfo *goparse.StructInfo) *jen.File {
 	// newRepo方法
 	f.Func().Id(fmt.Sprintf("New%sRepo", stInfo.Name)).Params(
 		jen.Id("data").Op("*").Id("Data"),
-		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Entry"),
+		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Logger"),
 	).Qual(importBiz, fmt.Sprintf("%sRepo", stInfo.Name)).Block(jen.Return(
 		jen.Op("&").Id(repoName).Values(jen.Dict{
 			jen.Id("data"): jen.Id("data"),
