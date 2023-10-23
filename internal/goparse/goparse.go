@@ -68,6 +68,9 @@ func ASTParse(filePath string) (*StructInfo, error) {
 
 		fields := make([]FieldsItem, 0)
 		for _, field := range s.Fields.List {
+			if field.Names[0].Name == "Id" {
+				continue
+			}
 			fmt.Printf("Field: %s, Type: %s\n", field.Names[0].Name, types.ExprString(field.Type))
 			fields = append(fields, FieldsItem{
 				Name:    field.Names[0].Name,
@@ -84,8 +87,12 @@ func ASTParse(filePath string) (*StructInfo, error) {
 
 func getDBTag(typeName string) string {
 	switch typeName {
-	case "uint64", "int", "int32", "int64":
+	case "int", "int32":
 		return "type:int"
+	case "uint64", "int64":
+		return "type:bigint"
+	case "int8":
+		return "type:tinyint"
 	case "bool":
 		return "type:tinyint"
 	case "time.Time":
