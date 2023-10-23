@@ -34,7 +34,7 @@ func Service(stInfo *goparse.StructInfo) *jen.File {
 	// New方法
 	f.Func().Id("New"+serviceName).Params(
 		jen.Id("uc").Op("*").Qual(importBiz, useCaseName),
-		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Entry"),
+		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Logger"),
 	).Id("*" + serviceName).Block(
 		jen.Return(
 			jen.Op("&").Id(serviceName).Values(

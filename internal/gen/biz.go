@@ -64,7 +64,7 @@ func Biz(stInfo *goparse.StructInfo) *jen.File {
 	f.Func().Id("New"+useCaseName).Params(
 		jen.Id("repo").Id(repoName),
 		jen.Id("tx").Id("Transaction"),
-		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Entry"),
+		jen.Id("logger").Op("*").Qual("github.com/sirupsen/logrus", "Logger"),
 	).Id("*" + useCaseName).Block(
 		jen.Return(
 			jen.Op("&").Id(useCaseName).Values(jen.Dict{
